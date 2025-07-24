@@ -28,26 +28,12 @@ const isLoading = computed(() => moviesStore.isLoading)
 const movies = computed(() => moviesStore.popularMovies.slice(0, 8))
 const error = computed(() => moviesStore.error)
 
-// Helper functions
-const { getImageUrl } = useTmdb()
-
-const formatDate = (dateString: string): string => {
-  if (!dateString) return 'Data não disponível'
-  
-  const date = new Date(dateString)
-  return date.toLocaleDateString('pt-BR', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  })
-}
-
 // Actions
 const toggleFavorite = async (movie: any) => {
   await favoritesStore.toggleFavorite(movie)
 }
 
-
+// 🧪 TESTE: Função para forçar reload e ver o loading
 const forceReload = async () => {
   await moviesStore.fetchPopularMovies(1, true) // forceRefresh = true
 }
@@ -94,37 +80,16 @@ const handleErrorRetry = async () => {
 
       <div class="row">
         <div v-for="movie in movies" :key="movie.id" class="col-md-3 col-sm-6 mb-4">
-          <div class="card h-100">
-            <img 
-              :src="getImageUrl(movie.poster_path)" 
-              :alt="movie.title"
-              class="card-img-top"
-              style="height: 300px; object-fit: cover;"
-            >
-            <div class="card-body d-flex flex-column">
-              <h6 class="card-title">{{ movie.title }}</h6>
-              <p class="card-text text-muted small flex-grow-1">
-                {{ movie.overview.substring(0, 100) }}...
-              </p>
-              <div class="mt-auto">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                  <small class="text-muted">{{ formatDate(movie.release_date) }}</small>
-                  <span class="badge bg-warning text-dark">
-                    <i class="bi bi-star-fill"></i> {{ movie.vote_average.toFixed(1) }}
-                  </span>
-                </div>
-                <!-- Botão de favorito -->
-               <FavoriteButton
-                  :is-favorite="favoritesStore.isFavorite(movie.id)"
-                  @toggle="toggleFavorite(movie)"
-                  size="sm"
-                  variant="filled"
-                  favorite-text="Favoritar"
-                  unfavorite-text="Remover"
-                />
-              </div>
-            </div>
-          </div>
+          <MovieCard
+            :movie="movie"
+            @click="$router.push(`/item/${movie.id}`)"
+            @favorite-toggle="toggleFavorite"
+            :show-favorite-button="true"
+            :show-rating="true"
+            :show-overview="true"
+            image-size="md"
+            variant="default"
+          />
         </div>
       </div>
     </div>
