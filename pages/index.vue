@@ -33,9 +33,8 @@ const toggleFavorite = async (movie: any) => {
   await favoritesStore.toggleFavorite(movie)
 }
 
-// 🧪 TESTE: Função para forçar reload e ver o loading
 const forceReload = async () => {
-  await moviesStore.fetchPopularMovies(1, true) // forceRefresh = true
+  await moviesStore.fetchPopularMovies(1, true)
 }
 
 // Error handling
@@ -49,56 +48,24 @@ const handleErrorRetry = async () => {
   <div class="container mt-4">
     <h1 class="mb-4">Movie Portal - Filmes Populares</h1>
     
-    <!-- Loading State -->
-    <LoadingSpinner 
-      v-if="isLoading" 
-      size="lg" 
-      text="Carregando filmes populares..." 
-      :full-height="false"
+    <!-- Loading, Error, or Movies Grid -->
+    <MovieGrid
+      :movies="movies"
+      :loading="isLoading"
+      :error="error"
+      :columns="{ xs: 1, sm: 2, md: 3, lg: 4 }"
+      card-variant="default"
+      card-image-size="md"
+      :show-favorites="true"
+      :show-rating="true"
+      :show-overview="true"
+      empty-state-title="Nenhum filme popular encontrado"
+      empty-state-message="Não conseguimos carregar os filmes populares no momento."
+      empty-state-icon="bi-film"
+      @movie-click="$router.push(`/item/${$event.id}`)"
+      @favorite-toggle="toggleFavorite"
+      @retry-load="handleErrorRetry"
     />
-
-    <!-- Error State -->
-    <ErrorAlert
-      v-else-if="error"
-      title="Erro ao carregar filmes"
-      :message="error"
-      variant="danger"
-      :dismissible="true"
-      :retry-action="handleErrorRetry"
-      retry-text="Recarregar filmes"
-      @dismiss="moviesStore.clearError"
-    />
-
-    <!-- Success State -->
-    <div v-else-if="movies.length > 0">
-      <div class="row mb-4">
-        <div class="col">
-          <h2>Filmes Populares</h2>
-          <p class="text-muted">{{ movies.length }} filmes carregados</p>
-        </div>
-      </div>
-
-      <div class="row">
-        <div v-for="movie in movies" :key="movie.id" class="col-md-3 col-sm-6 mb-4">
-          <MovieCard
-            :movie="movie"
-            @click="$router.push(`/item/${movie.id}`)"
-            @favorite-toggle="toggleFavorite"
-            :show-favorite-button="true"
-            :show-rating="true"
-            :show-overview="true"
-            image-size="md"
-            variant="default"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- Empty State -->
-    <div v-else class="text-center py-5">
-      <h3 class="text-muted">Nenhum filme encontrado</h3>
-      <p class="text-muted">Tente recarregar a página</p>
-    </div>
   </div>
 </template>
 
