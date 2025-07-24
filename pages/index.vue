@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { useTmdb } from '~/composables/useTmdb'
+import { useFavoritesStore } from '~/store/favorites'
+import { useMoviesStore } from '~/store/movies'
 
-// Imports
-const { getPopularMovies, getImageUrl } = useTmdb()
+// Stores
+const moviesStore = useMoviesStore()
+const favoritesStore = useFavoritesStore()
 
 // Meta tags
 useHead({
@@ -12,12 +14,23 @@ useHead({
   ]
 })
 
-// Fetch data
-const { data, pending, error } = await useLazyAsyncData('popular-movies', () => 
-  getPopularMovies(1)
-)
+// Initialize stores
+onMounted(() => {
+  favoritesStore.initializeFavorites()
+})
+
+// Fetch data usando a store
+const { data: popularMovies, pending, error } = await useLazyAsyncData('popular-movies', async () => {
+  return await moviesStore.fetchPopularMovies(1)
+})
+
+// Computed properties
+const isLoading = computed(() => moviesStore.isLoading)
+const movies = computed(() => moviesStore.popularMovies.slice(0, 8))
 
 // Helper functions
+const { getImageUrl } = useTmdb()
+
 const formatDate = (dateString: string): string => {
   if (!dateString) return 'Data não disponível'
   
@@ -28,6 +41,11 @@ const formatDate = (dateString: string): string => {
     day: 'numeric'
   })
 }
+
+// Toggle favorite
+const toggleFavorite = async (movie: any) => {
+  await favoritesStore.toggleFavorite(movie)
+}
 </script>
 
 <template>
@@ -35,29 +53,29 @@ const formatDate = (dateString: string): string => {
     <h1 class="mb-4">Movie Portal - Teste TMDB API</h1>
     
     <!-- Loading State -->
-    <div v-if="pending" class="text-center">
+    <div v-if="isLoading" class="text-center">
       <div class="spinner-border" role="status">
         <span class="visually-hidden">Carregando...</span>
       </div>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="alert alert-danger">
+    <div v-else-if="error || moviesStore.error" class="alert alert-danger">
       <h4>Erro ao carregar filmes:</h4>
-      <p>{{ error.message }}</p>
+      <p>{{ error?.message || moviesStore.error }}</p>
     </div>
 
     <!-- Success State -->
-    <div v-else-if="data">
+    <div v-else-if="movies.length > 0">
       <div class="row mb-4">
         <div class="col">
           <h2>Filmes Populares</h2>
-          <p class="text-muted">Total de {{ data.total_results }} filmes encontrados</p>
+          <p class="text-muted">{{ movies.length }} filmes carregados</p>
         </div>
       </div>
 
       <div class="row">
-        <div v-for="movie in data.results.slice(0, 12)" :key="movie.id" class="col-md-3 col-sm-6 mb-4">
+        <div v-for="movie in movies" :key="movie.id" class="col-md-3 col-sm-6 mb-4">
           <div class="card h-100">
             <img 
               :src="getImageUrl(movie.poster_path)" 
@@ -71,12 +89,21 @@ const formatDate = (dateString: string): string => {
                 {{ movie.overview.substring(0, 100) }}...
               </p>
               <div class="mt-auto">
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center mb-2">
                   <small class="text-muted">{{ formatDate(movie.release_date) }}</small>
                   <span class="badge bg-warning text-dark">
                     <i class="bi bi-star-fill"></i> {{ movie.vote_average.toFixed(1) }}
                   </span>
                 </div>
+                <!-- Botão de favorito -->
+                <button 
+                  @click="toggleFavorite(movie)"
+                  class="btn btn-sm w-100"
+                  :class="favoritesStore.isFavorite(movie.id) ? 'btn-danger' : 'btn-outline-danger'"
+                >
+                  <i :class="favoritesStore.isFavorite(movie.id) ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
+                  {{ favoritesStore.isFavorite(movie.id) ? 'Remover' : 'Favoritar' }}
+                </button>
               </div>
             </div>
           </div>
