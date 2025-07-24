@@ -114,14 +114,14 @@ const handleErrorRetry = async () => {
                   </span>
                 </div>
                 <!-- Botão de favorito -->
-                <button 
-                  @click="toggleFavorite(movie)"
-                  class="btn btn-sm w-100"
-                  :class="favoritesStore.isFavorite(movie.id) ? 'btn-danger' : 'btn-outline-danger'"
-                >
-                  <i :class="favoritesStore.isFavorite(movie.id) ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
-                  {{ favoritesStore.isFavorite(movie.id) ? 'Remover' : 'Favoritar' }}
-                </button>
+               <FavoriteButton
+                  :is-favorite="favoritesStore.isFavorite(movie.id)"
+                  @toggle="toggleFavorite(movie)"
+                  size="sm"
+                  variant="filled"
+                  favorite-text="Favoritar"
+                  unfavorite-text="Remover"
+                />
               </div>
             </div>
           </div>
