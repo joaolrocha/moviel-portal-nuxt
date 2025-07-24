@@ -15,18 +15,17 @@ useHead({
 })
 
 // Initialize stores
-onMounted(() => {
+onMounted(async () => {
   favoritesStore.initializeFavorites()
+  if (!moviesStore.hasPopularMovies) {
+    await moviesStore.fetchPopularMovies(1)
+  }
 })
 
-// Fetch data usando a store
-const { data: popularMovies, pending, error } = await useLazyAsyncData('popular-movies', async () => {
-  return await moviesStore.fetchPopularMovies(1)
-})
-
-// Computed properties
+// Computed properties - single source of truth from store
 const isLoading = computed(() => moviesStore.isLoading)
 const movies = computed(() => moviesStore.popularMovies.slice(0, 8))
+const error = computed(() => moviesStore.error)
 
 // Helper functions
 const { getImageUrl } = useTmdb()
@@ -42,7 +41,7 @@ const formatDate = (dateString: string): string => {
   })
 }
 
-// Toggle favorite
+// Actions
 const toggleFavorite = async (movie: any) => {
   await favoritesStore.toggleFavorite(movie)
 }
@@ -50,19 +49,20 @@ const toggleFavorite = async (movie: any) => {
 
 <template>
   <div class="container mt-4">
-    <h1 class="mb-4">Movie Portal - Teste TMDB API</h1>
+    <h1 class="mb-4">Movie Portal - Filmes Populares</h1>
     
     <!-- Loading State -->
-    <div v-if="isLoading" class="text-center">
-      <div class="spinner-border" role="status">
-        <span class="visually-hidden">Carregando...</span>
-      </div>
-    </div>
+    <LoadingSpinner 
+      v-if="isLoading" 
+      size="lg" 
+      text="Carregando filmes populares..." 
+      :full-height="false"
+    />
 
     <!-- Error State -->
-    <div v-else-if="error || moviesStore.error" class="alert alert-danger">
+    <div v-else-if="error" class="alert alert-danger">
       <h4>Erro ao carregar filmes:</h4>
-      <p>{{ error?.message || moviesStore.error }}</p>
+      <p>{{ error }}</p>
     </div>
 
     <!-- Success State -->
@@ -109,6 +109,12 @@ const toggleFavorite = async (movie: any) => {
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else class="text-center py-5">
+      <h3 class="text-muted">Nenhum filme encontrado</h3>
+      <p class="text-muted">Tente recarregar a página</p>
     </div>
   </div>
 </template>

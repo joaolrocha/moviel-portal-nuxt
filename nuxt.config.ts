@@ -9,7 +9,12 @@ export default defineNuxtConfig({
   modules: [
     '@pinia/nuxt'
   ],
-  
+  components: [
+    {
+      path: '~/components',
+      pathPrefix: false,
+    },
+  ],
   // CSS Global
   css: [
     'bootstrap/dist/css/bootstrap.min.css',
