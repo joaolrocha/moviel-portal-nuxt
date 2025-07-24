@@ -1,0 +1,198 @@
+/* ===== MOVIE GRID COMPONENT ===== */
+
+.movie-grid-container {
+  width: 100%;
+}
+
+/* ===== GRID STATES ===== */
+.movie-grid {
+  transition: opacity 0.3s ease;
+}
+
+.movie-grid-loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.movie-grid-error {
+  opacity: 1;
+}
+
+.movie-grid-empty {
+  opacity: 1;
+}
+
+/* ===== GRID ITEMS ===== */
+.movie-grid-item {
+  transition: all 0.3s ease;
+}
+
+.movie-grid-item:hover {
+  z-index: 1;
+}
+
+/* ===== LOADING STATE ===== */
+.movie-grid-loading-state {
+  padding: 3rem 0;
+  text-align: center;
+}
+
+/* ===== EMPTY STATE ===== */
+.movie-grid-empty-state {
+  padding: 4rem 0;
+  text-align: center;
+}
+
+.empty-state-content {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.empty-state-icon {
+  font-size: 4rem;
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+  display: block;
+}
+
+.empty-state-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #495057;
+}
+
+.empty-state-message {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 2rem;
+}
+
+.empty-state-actions {
+  margin-top: 1.5rem;
+}
+
+/* ===== FOOTER SECTION ===== */
+.movie-grid-footer {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #dee2e6;
+  text-align: center;
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* Extra small devices (phones, 576px and down) */
+@media (max-width: 575.98px) {
+  .movie-grid-container {
+    padding: 0 0.5rem;
+  }
+  
+  .movie-grid-empty-state {
+    padding: 2rem 0;
+  }
+  
+  .empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  
+  .empty-state-title {
+    font-size: 1.25rem;
+  }
+  
+  .empty-state-message {
+    font-size: 0.9rem;
+  }
+  
+  .movie-grid-loading-state {
+    padding: 2rem 0;
+  }
+}
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .movie-grid-item {
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .movie-grid-container {
+    padding: 0 1rem;
+  }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+  .movie-grid-item {
+    margin-bottom: 2rem;
+  }
+  
+  .movie-grid-footer {
+    margin-top: 3rem;
+    padding-top: 3rem;
+  }
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  .movie-grid-container {
+    padding: 0 2rem;
+  }
+}
+
+/* ===== GRID ANIMATION EFFECTS ===== */
+.movie-grid-item {
+  animation: fadeInUp 0.6s ease forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Stagger animation for grid items */
+.movie-grid-item:nth-child(1) { animation-delay: 0.1s; }
+.movie-grid-item:nth-child(2) { animation-delay: 0.2s; }
+.movie-grid-item:nth-child(3) { animation-delay: 0.3s; }
+.movie-grid-item:nth-child(4) { animation-delay: 0.4s; }
+.movie-grid-item:nth-child(5) { animation-delay: 0.5s; }
+.movie-grid-item:nth-child(6) { animation-delay: 0.6s; }
+.movie-grid-item:nth-child(7) { animation-delay: 0.7s; }
+.movie-grid-item:nth-child(8) { animation-delay: 0.8s; }
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+  .movie-grid-item {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  
+  .movie-grid,
+  .movie-grid-item {
+    transition: none;
+  }
+}
+
+/* ===== HIGH CONTRAST MODE ===== */
+@media (prefers-contrast: high) {
+  .empty-state-icon {
+    color: #000;
+  }
+  
+  .empty-state-title {
+    color: #000;
+  }
+  
+  .movie-grid-footer {
+    border-top-width: 2px;
+    border-top-color: #000;
+  }
+}
