@@ -14,9 +14,10 @@ useHead({
   ]
 })
 
-// Initialize stores
+// Initialize stores and fetch data
 onMounted(async () => {
   favoritesStore.initializeFavorites()
+  // Fetch movies only if not already loaded (smart cache)
   if (!moviesStore.hasPopularMovies) {
     await moviesStore.fetchPopularMovies(1)
   }
@@ -45,6 +46,17 @@ const formatDate = (dateString: string): string => {
 const toggleFavorite = async (movie: any) => {
   await favoritesStore.toggleFavorite(movie)
 }
+
+
+const forceReload = async () => {
+  await moviesStore.fetchPopularMovies(1, true) // forceRefresh = true
+}
+
+// Error handling
+const handleErrorRetry = async () => {
+  moviesStore.clearError()
+  await forceReload()
+}
 </script>
 
 <template>
@@ -60,10 +72,16 @@ const toggleFavorite = async (movie: any) => {
     />
 
     <!-- Error State -->
-    <div v-else-if="error" class="alert alert-danger">
-      <h4>Erro ao carregar filmes:</h4>
-      <p>{{ error }}</p>
-    </div>
+    <ErrorAlert
+      v-else-if="error"
+      title="Erro ao carregar filmes"
+      :message="error"
+      variant="danger"
+      :dismissible="true"
+      :retry-action="handleErrorRetry"
+      retry-text="Recarregar filmes"
+      @dismiss="moviesStore.clearError"
+    />
 
     <!-- Success State -->
     <div v-else-if="movies.length > 0">
