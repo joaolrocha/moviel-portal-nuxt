@@ -26,7 +26,7 @@ interface MoviesState {
 }
 
 export const useMoviesStore = defineStore('movies', {
-  // 🏗️ STATE - Single Source of Truth
+  // STATE - Single Source of Truth
   state: (): MoviesState => ({
     // Cache arrays
     popularMovies: [],
@@ -50,7 +50,7 @@ export const useMoviesStore = defineStore('movies', {
     error: null
   }),
 
-  // 🧮 GETTERS - Computed Properties
+  // GETTERS - Computed Properties
   getters: {
     // Verifica se os filmes populares estão carregados
     hasPopularMovies: (state): boolean => state.popularMovies.length > 0,
@@ -84,9 +84,9 @@ export const useMoviesStore = defineStore('movies', {
     }
   },
 
-  // 🎬 ACTIONS - Business Logic
+  // ACTIONS - Business Logic
   actions: {
-    // 🚀 Buscar filmes populares
+    // Buscar filmes populares
     async fetchPopularMovies(page: number = 1, forceRefresh: boolean = false) {
       // Evita requisições desnecessárias
       if (!forceRefresh && this.popularPage >= page && this.hasPopularMovies) {
@@ -123,7 +123,7 @@ export const useMoviesStore = defineStore('movies', {
       }
     },
 
-    // 🎭 Buscar filmes em cartaz
+    // Buscar filmes em cartaz
     async fetchNowPlayingMovies(page: number = 1, forceRefresh: boolean = false) {
       if (!forceRefresh && this.nowPlayingPage >= page && this.hasNowPlayingMovies) {
         return this.nowPlayingMovies
@@ -185,7 +185,7 @@ export const useMoviesStore = defineStore('movies', {
       }
     },
 
-    // 🔎 Buscar filmes por termo
+    // Buscar filmes por termo
     async searchMovies(query: string, page: number = 1) {
       // Se é uma nova busca, limpa os resultados
       if (query !== this.searchQuery) {
@@ -222,19 +222,19 @@ export const useMoviesStore = defineStore('movies', {
       }
     },
 
-    // 🧹 Limpar busca
+    // Limpar busca
     clearSearch() {
       this.searchResults = []
       this.searchQuery = ''
       this.searchPage = 0
     },
 
-    // 🔄 Reset da store
+    // Reset da store
     resetStore() {
       this.$reset()
     },
 
-    // 🗑️ Limpar erros
+    // Limpar erros
     clearError() {
       this.error = null
     }
