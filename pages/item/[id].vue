@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MovieDetails, Credits } from '~/composables/useTmdb'
+import type { Credits, MovieDetails } from '~/composables/useTmdb'
 import { useFavoritesStore } from '~/store/favorites'
 import { useMoviesStore } from '~/store/movies'
 
@@ -37,28 +37,6 @@ const posterUrl = computed(() =>
 const isFavorite = computed(() => 
   movie.value ? favoritesStore.isFavorite(movie.value.id) : false
 )
-
-const formattedBudget = computed(() => {
-  if (!movie.value?.budget || movie.value.budget === 0) return 'Não informado'
-  
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(movie.value.budget)
-})
-
-const formattedRevenue = computed(() => {
-  if (!movie.value?.revenue || movie.value.revenue === 0) return 'Não informado'
-  
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(movie.value.revenue)
-})
 
 // Actions
 const toggleFavorite = async () => {
@@ -188,67 +166,15 @@ useHead(() => ({
 
             <!-- Movie Info Sidebar -->
             <div class="col-lg-4">
-              <div class="movie-info-sidebar">
-                <h3 class="section-title">Informações</h3>
-                
-                <div class="info-list">
-                  <!-- Status -->
-                  <div class="info-item">
-                    <strong>Status:</strong>
-                    <span>{{ movie.status || 'Não informado' }}</span>
-                  </div>
-
-                  <!-- Budget -->
-                  <div class="info-item">
-                    <strong>Orçamento:</strong>
-                    <span>{{ formattedBudget }}</span>
-                  </div>
-
-                  <!-- Revenue -->
-                  <div class="info-item">
-                    <strong>Bilheteria:</strong>
-                    <span>{{ formattedRevenue }}</span>
-                  </div>
-
-                  <!-- Languages -->
-                  <div v-if="movie.spoken_languages && movie.spoken_languages.length" class="info-item">
-                    <strong>Idiomas:</strong>
-                    <span>{{ movie.spoken_languages.map(lang => lang.name).join(', ') }}</span>
-                  </div>
-
-                  <!-- Production Companies -->
-                  <div v-if="movie.production_companies && movie.production_companies.length" class="info-item">
-                    <strong>Produtoras:</strong>
-                    <span>{{ movie.production_companies.map(company => company.name).join(', ') }}</span>
-                  </div>
-
-                  <!-- IMDB Link -->
-                  <div v-if="movie.imdb_id" class="info-item">
-                    <strong>IMDB:</strong>
-                    <a 
-                      :href="`https://www.imdb.com/title/${movie.imdb_id}`"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="text-decoration-none"
-                    >
-                      Ver no IMDB <i class="bi bi-box-arrow-up-right"></i>
-                    </a>
-                  </div>
-
-                  <!-- Homepage -->
-                  <div v-if="movie.homepage" class="info-item">
-                    <strong>Site Oficial:</strong>
-                    <a 
-                      :href="movie.homepage"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="text-decoration-none"
-                    >
-                      Visitar site <i class="bi bi-box-arrow-up-right"></i>
-                    </a>
-                  </div>
-                </div>
-              </div>
+              <MovieInfoSidebar
+                :movie="movie"
+                :show-budget="true"
+                :show-revenue="true"
+                :show-status="true"
+                :show-languages="true"
+                :show-companies="true"
+                :show-external-links="true"
+              />
             </div>
           </div>
         </div>
