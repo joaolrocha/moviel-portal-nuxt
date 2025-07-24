@@ -60,14 +60,6 @@ const formattedRevenue = computed(() => {
   }).format(movie.value.revenue)
 })
 
-const mainCast = computed(() => 
-  credits.value?.cast.slice(0, 8) || []
-)
-
-const director = computed(() => 
-  credits.value?.crew.find(person => person.job === 'Director')
-)
-
 // Actions
 const toggleFavorite = async () => {
   if (movie.value) {
@@ -186,41 +178,12 @@ useHead(() => ({
           <div class="row">
             <!-- Cast & Crew -->
             <div class="col-lg-8 mb-5">
-              <!-- Director -->
-              <div v-if="director" class="director-section mb-4">
-                <h3 class="section-title">Direção</h3>
-                <div class="director-card">
-                  <h4 class="director-name">{{ director.name }}</h4>
-                </div>
-              </div>
-
-              <!-- Cast -->
-              <div v-if="mainCast.length" class="cast-section">
-                <h3 class="section-title">Elenco Principal</h3>
-                <div class="row">
-                  <div 
-                    v-for="actor in mainCast" 
-                    :key="actor.id"
-                    class="col-lg-3 col-md-4 col-sm-6 mb-4"
-                  >
-                    <div class="cast-card text-center">
-                      <div class="cast-photo-container mb-2">
-                        <img 
-                          v-if="actor.profile_path"
-                          :src="getImageUrl(actor.profile_path, 'w185')"
-                          :alt="actor.name"
-                          class="cast-photo rounded-circle"
-                        >
-                        <div v-else class="cast-photo-placeholder rounded-circle">
-                          <i class="bi bi-person"></i>
-                        </div>
-                      </div>
-                      <h5 class="cast-name">{{ actor.name }}</h5>
-                      <p class="cast-character text-muted">{{ actor.character }}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <CastSection
+                :credits="credits"
+                :max-cast-members="8"
+                :show-director="true"
+                :show-cast="true"
+              />
             </div>
 
             <!-- Movie Info Sidebar -->
