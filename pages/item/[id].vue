@@ -38,25 +38,6 @@ const isFavorite = computed(() =>
   movie.value ? favoritesStore.isFavorite(movie.value.id) : false
 )
 
-const formattedDate = computed(() => {
-  if (!movie.value?.release_date) return 'Data não disponível'
-  
-  const date = new Date(movie.value.release_date)
-  return date.toLocaleDateString('pt-BR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-})
-
-const formattedRuntime = computed(() => {
-  if (!movie.value?.runtime) return 'Duração não informada'
-  
-  const hours = Math.floor(movie.value.runtime / 60)
-  const minutes = movie.value.runtime % 60
-  return `${hours}h ${minutes}min`
-})
-
 const formattedBudget = computed(() => {
   if (!movie.value?.budget || movie.value.budget === 0) return 'Não informado'
   
@@ -86,14 +67,6 @@ const mainCast = computed(() =>
 const director = computed(() => 
   credits.value?.crew.find(person => person.job === 'Director')
 )
-
-const ratingColor = computed(() => {
-  if (!movie.value) return 'secondary'
-  const rating = movie.value.vote_average
-  if (rating >= 8) return 'success'
-  if (rating >= 6) return 'warning'
-  return 'danger'
-})
 
 // Actions
 const toggleFavorite = async () => {
@@ -196,102 +169,16 @@ useHead(() => ({
     <!-- Movie Details -->
     <div v-else-if="movie" class="movie-details-content">
       <!-- Hero Section with Backdrop -->
-      <div class="hero-section" :style="backdropUrl ? `background-image: url(${backdropUrl})` : ''">
-        <div class="hero-overlay">
-          <div class="container">
-            <div class="row align-items-center min-vh-50">
-              <!-- Poster Column -->
-              <div class="col-lg-4 col-md-5 mb-4 mb-md-0">
-                <div class="poster-container">
-                  <img 
-                    v-if="posterUrl"
-                    :src="posterUrl" 
-                    :alt="`Poster de ${movie.title}`"
-                    class="movie-poster img-fluid rounded shadow-lg"
-                  >
-                  <div v-else class="poster-placeholder">
-                    <i class="bi bi-film"></i>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Info Column -->
-              <div class="col-lg-8 col-md-7">
-                <div class="movie-info text-white">
-                  <!-- Back Button -->
-                  <button @click="goBack" class="btn btn-outline-light btn-sm mb-3">
-                    <i class="bi bi-arrow-left me-2"></i>
-                    Voltar
-                  </button>
-
-                  <!-- Title -->
-                  <h1 class="movie-title display-4 fw-bold mb-3">
-                    {{ movie.title }}
-                  </h1>
-
-                  <!-- Original Title -->
-                  <h2 v-if="movie.original_title !== movie.title" class="movie-original-title h5 text-light mb-3">
-                    {{ movie.original_title }}
-                  </h2>
-
-                  <!-- Meta Info -->
-                  <div class="movie-meta mb-4">
-                    <div class="d-flex flex-wrap gap-3 align-items-center">
-                      <!-- Rating -->
-                      <span class="badge fs-6" :class="`bg-${ratingColor}`">
-                        <i class="bi bi-star-fill me-1"></i>
-                        {{ movie.vote_average.toFixed(1) }}
-                        <small class="ms-1">({{ movie.vote_count }} votos)</small>
-                      </span>
-
-                      <!-- Release Date -->
-                      <span class="text-light">
-                        <i class="bi bi-calendar me-1"></i>
-                        {{ formattedDate }}
-                      </span>
-
-                      <!-- Runtime -->
-                      <span class="text-light">
-                        <i class="bi bi-clock me-1"></i>
-                        {{ formattedRuntime }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- Genres -->
-                  <div v-if="movie.genres && movie.genres.length" class="movie-genres mb-4">
-                    <span 
-                      v-for="genre in movie.genres" 
-                      :key="genre.id"
-                      class="badge bg-secondary me-2 mb-2"
-                    >
-                      {{ genre.name }}
-                    </span>
-                  </div>
-
-                  <!-- Overview -->
-                  <div class="movie-overview mb-4">
-                    <h3 class="h5 mb-3">Sinopse</h3>
-                    <p class="lead">{{ movie.overview || 'Sinopse não disponível.' }}</p>
-                  </div>
-
-                  <!-- Actions -->
-                  <div class="movie-actions">
-                    <FavoriteButton
-                      :is-favorite="isFavorite"
-                      @toggle="toggleFavorite"
-                      size="lg"
-                      variant="filled"
-                      favorite-text="Adicionar aos Favoritos"
-                      unfavorite-text="Remover dos Favoritos"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <HeroSection
+        :movie="movie"
+        :backdrop-url="backdropUrl"
+        :poster-url="posterUrl"
+        :is-favorite="isFavorite"
+        :show-back-button="true"
+        :show-favorite-button="true"
+        @back="goBack"
+        @favorite-toggle="toggleFavorite"
+      />
 
       <!-- Details Section -->
       <div class="details-section py-5">
