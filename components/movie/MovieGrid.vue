@@ -21,6 +21,9 @@ interface Props {
   emptyStateTitle?: string
   emptyStateMessage?: string
   emptyStateIcon?: string
+  infiniteScroll?: boolean
+  hasMoreData?: boolean
+  isLoadingMore?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -41,7 +44,10 @@ const props = withDefaults(defineProps<Props>(), {
   showOverview: true,
   emptyStateTitle: 'Nenhum filme encontrado',
   emptyStateMessage: 'Não há filmes para exibir no momento.',
-  emptyStateIcon: 'bi-film'
+  emptyStateIcon: 'bi-film',
+  infiniteScroll: false,
+  hasMoreData: true,
+  isLoadingMore: false
 })
 
 // Emits
@@ -49,6 +55,7 @@ const emit = defineEmits<{
   movieClick: [movie: Movie]
   favoriteToggle: [movie: Movie]
   retryLoad: []
+  loadMore: []
 }>()
 
 // Computed properties
@@ -89,6 +96,74 @@ const handleFavoriteToggle = (movie: Movie) => {
 const handleRetry = () => {
   emit('retryLoad')
 }
+
+// Infinite Scroll Logic
+const infiniteScrollRef = ref<HTMLElement>()
+let observer: IntersectionObserver | null = null
+
+const handleLoadMore = async () => {
+  if (props.isLoadingMore || props.loading || !props.hasMoreData) {
+    return
+  }
+  
+  emit('loadMore')
+}
+
+// Intersection Observer for infinite scroll
+const setupInfiniteScroll = () => {
+  // Disconnect existing observer
+  if (observer) {
+    observer.disconnect()
+    observer = null
+  }
+
+  if (!props.infiniteScroll || !infiniteScrollRef.value) {
+    return
+  }
+
+  observer = new IntersectionObserver(
+    (entries) => {
+      const [entry] = entries
+      
+      if (entry.isIntersecting && props.hasMoreData && !props.loading && !props.isLoadingMore) {
+        handleLoadMore()
+      }
+    },
+    {
+      root: null,
+      rootMargin: '200px',
+      threshold: 0.1
+    }
+  )
+
+  observer.observe(infiniteScrollRef.value)
+
+  // Cleanup on unmount
+  onUnmounted(() => {
+    if (observer) {
+      observer.disconnect()
+    }
+  })
+}
+
+// Setup infinite scroll when component mounts
+onMounted(() => {
+  if (props.infiniteScroll) {
+    // Delay para garantir que o DOM está renderizado
+    setTimeout(() => {
+      setupInfiniteScroll()
+    }, 100)
+  }
+})
+
+// Watch for changes in movies array to re-setup observer
+watch(() => [props.movies?.length, props.infiniteScroll], () => {
+  if (props.infiniteScroll && props.movies && props.movies.length > 0) {
+    nextTick(() => {
+      setupInfiniteScroll()
+    })
+  }
+}, { immediate: true })
 </script>
 
 <template>
@@ -129,7 +204,7 @@ const handleRetry = () => {
     </div>
 
     <!-- Movies Grid -->
-    <div v-else :class="gridClasses">
+    <div v-if="hasMovies" :class="gridClasses">
       <div 
         v-for="movie in movies" 
         :key="movie.id" 
@@ -146,6 +221,40 @@ const handleRetry = () => {
           @click="handleMovieClick"
           @favorite-toggle="handleFavoriteToggle"
         />
+      </div>
+    </div>
+
+    <!-- Infinite Scroll Trigger -->
+    <div 
+      v-if="infiniteScroll && hasMovies" 
+      ref="infiniteScrollRef" 
+      class="infinite-scroll-trigger"
+    >
+      <!-- Loading More Indicator -->
+      <div v-if="isLoadingMore" class="loading-more-container">
+        <div class="d-flex align-items-center justify-content-center">
+          <div class="spinner-border text-primary me-3" role="status">
+            <span class="visually-hidden">Carregando...</span>
+          </div>
+          <span class="text-muted">Carregando mais filmes...</span>
+        </div>
+      </div>
+      
+      <!-- End of Results -->
+      <div v-else-if="!hasMoreData" class="end-of-results">
+        <div class="text-center py-4">
+          <i class="bi bi-check-circle text-success fs-2 mb-2"></i>
+          <p class="text-muted mb-0">
+            Você viu todos os filmes disponíveis! 🎬
+          </p>
+        </div>
+      </div>
+      
+      <!-- Scroll Trigger Zone (invisible) -->
+      <div v-else class="scroll-trigger-zone">
+        <div class="text-center py-3 text-muted">
+          <small>Role para carregar mais filmes...</small>
+        </div>
       </div>
     </div>
 

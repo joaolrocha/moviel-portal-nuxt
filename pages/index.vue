@@ -24,9 +24,15 @@ onMounted(async () => {
 })
 
 // Computed properties - single source of truth from store
-const isLoading = computed(() => moviesStore.isLoading)
-const movies = computed(() => moviesStore.popularMovies.slice(0, 8))
+const isLoading = computed(() => moviesStore.isLoading && moviesStore.popularMovies.length === 0) // Só mostra loading se não tem filmes
+const isLoadingMore = ref(false) // Loading para infinite scroll
+const movies = computed(() => moviesStore.popularMovies) // Mostrar TODOS os filmes
 const error = computed(() => moviesStore.error)
+const hasMoreData = computed(() => {
+  // TMDB tem até 500 páginas, cada uma com 20 filmes
+  const maxMovies = 500 * 20
+  return moviesStore.popularMovies.length < maxMovies
+})
 
 // Actions
 const toggleFavorite = async (movie: any) => {
@@ -34,7 +40,26 @@ const toggleFavorite = async (movie: any) => {
 }
 
 const forceReload = async () => {
-  await moviesStore.fetchPopularMovies(1, true)
+  await moviesStore.fetchPopularMovies(1, true) // forceRefresh = true
+}
+
+// Infinite scroll handler
+const handleLoadMore = async () => {
+  // Prevent multiple loads
+  if (isLoadingMore.value) return
+  
+  isLoadingMore.value = true
+  
+  try {
+    await moviesStore.loadMorePopularMovies()
+  } catch (error) {
+    console.error('Erro ao carregar mais filmes:', error)
+  } finally {
+    // Small delay to show loading state
+    setTimeout(() => {
+      isLoadingMore.value = false
+    }, 500)
+  }
 }
 
 // Error handling
@@ -48,10 +73,18 @@ const handleErrorRetry = async () => {
   <div class="container mt-4">
     <h1 class="mb-4">Movie Portal - Filmes Populares</h1>
     
+    <!-- 🧪 TESTE: Botão para testar loading -->
+    <div class="mb-3">
+      <button @click="forceReload" class="btn btn-outline-primary btn-sm">
+        🔄 Testar Loading
+      </button>
+    </div>
+    
     <!-- Loading, Error, or Movies Grid -->
     <MovieGrid
       :movies="movies"
       :loading="isLoading"
+      :is-loading-more="isLoadingMore"
       :error="error"
       :columns="{ xs: 1, sm: 2, md: 3, lg: 4 }"
       card-variant="default"
@@ -59,12 +92,15 @@ const handleErrorRetry = async () => {
       :show-favorites="true"
       :show-rating="true"
       :show-overview="true"
+      :infinite-scroll="true"
+      :has-more-data="hasMoreData"
       empty-state-title="Nenhum filme popular encontrado"
       empty-state-message="Não conseguimos carregar os filmes populares no momento."
       empty-state-icon="bi-film"
       @movie-click="$router.push(`/item/${$event.id}`)"
       @favorite-toggle="toggleFavorite"
       @retry-load="handleErrorRetry"
+      @load-more="handleLoadMore"
     />
   </div>
 </template>
