@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { useFavoritesStore } from './favorites'
 
 // Types para autenticação
 interface User {
@@ -181,7 +182,14 @@ export const useAuthStore = defineStore('auth', {
         localStorage.removeItem('auth-token')
         localStorage.removeItem('auth-user')
         localStorage.removeItem('last-login')
+        
+        // Limpar favoritos também no logout
+        localStorage.removeItem('movie-favorites')
       }
+      
+      // Limpar favoritos da store
+      const favoritesStore = useFavoritesStore()
+      favoritesStore.clearAllFavorites()
     },
 
     // 🔄 Refresh token (simulação)
