@@ -92,7 +92,12 @@ export const useTmdb = () => {
   // Helper para construir URLs de imagem
   const getImageUrl = (path: string | null, size: string = 'w500'): string => {
     if (!path) return '/placeholder-movie.jpg'
-    return `${imageBaseUrl}/${size}${path}`
+    
+    // Garantir que a URL está correta
+    const cleanPath = path.startsWith('/') ? path : `/${path}`
+    const fullUrl = `${imageBaseUrl}/${size}${cleanPath}`
+    
+    return fullUrl
   }
 
   // Helper para fazer requisições à API
