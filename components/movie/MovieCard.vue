@@ -57,10 +57,6 @@ const imageClasses = computed(() => [
   }
 ])
 
-const posterUrl = computed(() => 
-  getImageUrl(props.movie.poster_path, props.imageSize === 'lg' ? 'w780' : 'w500')
-)
-
 const formattedDate = computed(() => {
   if (!props.movie.release_date) return 'Data não disponível'
   
@@ -112,20 +108,46 @@ const handleFavoriteClick = (event: Event) => {
 // Image loading state
 const imageLoaded = ref(false)
 const imageError = ref(false)
+const retryCount = ref(0)
+const maxRetries = 2
+
+const imageSizes = ['w342', 'w500', 'w300'] // Tamanhos para tentar
+
+const getCurrentImageUrl = (): string => {
+  if (!props.movie.poster_path) return '/placeholder-movie.jpg'
+  
+  const sizeIndex = retryCount.value % imageSizes.length
+  const size = imageSizes[sizeIndex]
+  return getImageUrl(props.movie.poster_path, size)
+}
 
 const handleImageLoad = () => {
   imageLoaded.value = true
+  imageError.value = false
 }
 
 const handleImageError = () => {
-  imageError.value = true
-  imageLoaded.value = true
+  
+  if (retryCount.value < maxRetries) {
+    retryCount.value++
+    // Força um novo try com tamanho diferente
+    nextTick(() => {
+      const img = document.querySelector(`[data-movie-id="${props.movie.id}"] img`)
+      if (img) {
+        (img as HTMLImageElement).src = getCurrentImageUrl()
+      }
+    })
+  } else {
+    imageError.value = true
+    imageLoaded.value = true
+  }
 }
 </script>
 
 <template>
   <div 
     :class="cardClasses"
+    :data-movie-id="movie.id"
     @click="handleCardClick"
     :role="clickable ? 'button' : undefined"
     :tabindex="clickable ? 0 : undefined"
@@ -154,12 +176,11 @@ const handleImageError = () => {
       <!-- Actual image -->
       <img 
         v-show="imageLoaded && !imageError"
-        :src="posterUrl"
+        :src="getCurrentImageUrl()"
         :alt="`Poster do filme ${movie.title}`"
         :class="imageClasses"
         @load="handleImageLoad"
         @error="handleImageError"
-        loading="lazy"
       >
 
       <!-- Error fallback -->
@@ -242,5 +263,6 @@ const handleImageError = () => {
 </template>
 
 <style>
+/* Import external CSS */
 @import '~/assets/styles/components/movie-card.css';
 </style>
