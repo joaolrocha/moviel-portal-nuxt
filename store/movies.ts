@@ -123,6 +123,12 @@ export const useMoviesStore = defineStore('movies', {
       }
     },
 
+    // Buscar próxima página para infinite scroll
+    async loadMorePopularMovies() {
+      const nextPage = this.popularPage + 1
+      return await this.fetchPopularMovies(nextPage, false)
+    },
+
     // Buscar filmes em cartaz
     async fetchNowPlayingMovies(page: number = 1, forceRefresh: boolean = false) {
       if (!forceRefresh && this.nowPlayingPage >= page && this.hasNowPlayingMovies) {
@@ -157,7 +163,7 @@ export const useMoviesStore = defineStore('movies', {
       }
     },
 
-    // 🔍 Buscar detalhes de um filme
+    // Buscar detalhes de um filme
     async fetchMovieDetails(movieId: number, forceRefresh: boolean = false) {
       // Cache hit - retorna se já temos os dados
       if (!forceRefresh && this.isMovieLoaded(movieId)) {
