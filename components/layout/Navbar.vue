@@ -47,6 +47,15 @@ const navigateTo = (path: string) => {
 watch(route, () => {
   closeMenu()
 })
+
+// Initialize auth on component mount
+onMounted(() => {
+  // Initialize auth state from localStorage
+  authStore.initializeAuth()
+  
+  // Initialize favorites SEMPRE (para não quebrar a reatividade)
+  favoritesStore.initializeFavorites()
+})
 </script>
 
 <template>

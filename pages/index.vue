@@ -73,13 +73,6 @@ const handleErrorRetry = async () => {
   <div class="container mt-4">
     <h1 class="mb-4">Movie Portal - Filmes Populares</h1>
     
-    <!-- 🧪 TESTE: Botão para testar loading -->
-    <div class="mb-3">
-      <button @click="forceReload" class="btn btn-outline-primary btn-sm">
-        🔄 Testar Loading
-      </button>
-    </div>
-    
     <!-- Loading, Error, or Movies Grid -->
     <MovieGrid
       :movies="movies"
