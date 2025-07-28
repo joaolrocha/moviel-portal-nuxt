@@ -304,7 +304,7 @@ A aplicação está configurada para deploy automático na Vercel:
 
 ## Autor
 
-**Seu Nome**
+**Joao Luiz Rocha**
 - GitHub: [@joaolrocha](https://github.com/joaolrocha)
 - LinkedIn: [Joao Luiz Rocha](https://linkedin.com/in/rochajoao)
 - Email: joaolrocha07@gmail.com
