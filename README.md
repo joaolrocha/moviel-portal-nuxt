@@ -186,8 +186,8 @@ O projeto utiliza **Vitest** como framework de testes com **Vue Test Utils** par
 Sistema de autenticação fake para demonstração:
 
 **Credenciais de teste:**
-- Email: `joao@exemplo.com` | Senha: qualquer (3+ caracteres)
-- Email: `maria@exemplo.com` | Senha: qualquer (3+ caracteres)
+- Email: `joao@email.com` | Senha: qualquer (3+ caracteres)
+- Email: `maria@email.com` | Senha: qualquer (3+ caracteres)
 
 ## Componentes Criados
 
