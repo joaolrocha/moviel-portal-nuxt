@@ -155,12 +155,6 @@ movie-portal-nuxt3/
 ### Configuração de Testes
 O projeto utiliza **Vitest** como framework de testes com **Vue Test Utils** para testes de componentes Vue.
 
-### Executar Testes
-```bash
-# Executar todos os testes
-npm run test
-
-### Cobertura de Testes
 
 #### Composables Testados
 - **useTmdb.ts**: Testes completos da integração com TMDB API
@@ -223,7 +217,7 @@ npm run build
 
 # Preview da build
 npm run preview
-
+```
 ## Responsividade
 
 ### Breakpoints Bootstrap
