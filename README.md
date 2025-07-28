@@ -12,7 +12,7 @@ Um portal moderno de filmes construído com Nuxt 3, Vue 3, TypeScript e Bootstra
 
 🚀 **[Ver aplicação funcionando](https://moviel-portal-nuxt.vercel.app/)**
 
-Aplicação deployada automaticamente na Vercel com integração contínua via GitHub Actions.
+deploy da aplicação na Vercel com integração contínua via GitHub Actions.
 
 ## Funcionalidades
 
